@@ -1,4 +1,5 @@
 @extends('layouts')
+
 @section('content')
     <h2>Data Detail Transaksi</h2>
     <div class="card">
@@ -6,9 +7,11 @@
             <a href="{{ route('dashboard') }}" class="btn btn-outline-danger">Kembali</a>
         </div>
         <div class="card-body">
+            {{-- Jika tidak ada data --}}
             @if ($transaksidetail->isEmpty())
                 <div class="alert alert-warning">Tidak ada data detail transaksi.</div>
             @else
+                {{-- Tabel Data Detail Transaksi --}}
                 <table class="table table-bordered datatable">
                     <thead>
                         <tr>
@@ -36,4 +39,7 @@
             @endif
         </div>
     </div>
+
+    {{-- Include Komponen DataTables --}}
+    @include('components.datatable')
 @endsection
