@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Transaksi;
 use App\Models\TransaksiDetail;
 use Illuminate\Http\Request;
-
-use App\Models\Transaksi;
 use Illuminate\Support\Facades\DB;
 
 class TransaksiController extends Controller
 {
     public function index()
     {
-        $transaksi = Transaksi::orderBy('tanggal_pembelian','DESC')->get();
+        // Menampilkan transaksi terbaru terlebih dahulu
+        $transaksi = Transaksi::orderBy('tanggal_pembelian', 'DESC')->get();
 
-        return view('transaksi.index');
+        return view('transaksi.index', compact('transaksi'));
     }
 
     public function create()
@@ -38,8 +38,12 @@ class TransaksiController extends Controller
             'jumlah3' => 'required|numeric',
         ]);
 
-        // Gunakan transaction
+        // Mulai transaksi
+        DB::beginTransaction();
+
         try {
+            // Membuat transaksi baru
+            $transaksi = new Transaksi();
             $transaksi->tanggal_pembelian = $request->input('tanggal_pembelian');
             $transaksi->total_harga = 0;
             $transaksi->bayar = $request->input('bayar');
@@ -47,19 +51,35 @@ class TransaksiController extends Controller
             $transaksi->save();
 
             $total_harga = 0;
-            for (){
+            $i = 1;
+            
+            // Loop untuk menambahkan detail transaksi
+            while ($request->has('nama_produk' . $i)) {
+                $transaksidetail = new TransaksiDetail();
                 $transaksidetail->id_transaksi = $transaksi->id;
-                $transaksidetail->nama_produk = $request->input('nama_produk'.$i);
-                $transaksidetail->harga_satuan = $request->input('harga_satuan'.$i);
-                $transaksidetail->jumlah = $request->input('jumlah'.$i);
-                $transaksidetail->subtotal = $request->input('harga_satuan'.$i)*$request->input('jumlah'.$i);
-                $total_harga += $transaksidetail->subtotal;
-            }
-            $transaksi->total_harga = $total_harga;
-            $transaksi->kembalian =
+                $transaksidetail->nama_produk = $request->input('nama_produk' . $i);
+                $transaksidetail->harga_satuan = $request->input('harga_satuan' . $i);
+                $transaksidetail->jumlah = $request->input('jumlah' . $i);
+                $transaksidetail->subtotal = $request->input('harga_satuan' . $i) * $request->input('jumlah' . $i);
+                $transaksidetail->save();
 
-            return redirect('transaksidetail/'.$transaksi->id)->with('pesan', 'Berhasil menambahkan data');
+                // Menambahkan subtotal ke total harga
+                $total_harga += $transaksidetail->subtotal;
+                $i++;
+            }
+
+            // Update total harga dan kembalian transaksi utama
+            $transaksi->total_harga = $total_harga;
+            $transaksi->kembalian = $transaksi->bayar - $total_harga;
+            $transaksi->save();
+
+            // Commit transaksi
+            DB::commit();
+
+            return redirect()->route('transaksidetail.index', ['id_transaksi' => $transaksi->id])
+                             ->with('pesan', 'Berhasil menambahkan transaksi');
         } catch (\Exception $e) {
+            // Rollback jika ada kesalahan
             DB::rollback();
             return redirect()->back()->withErrors(['Transaction' => 'Gagal menambahkan data'])->withInput();
         }
@@ -68,26 +88,31 @@ class TransaksiController extends Controller
     public function edit($id)
     {
         $transaksi = Transaksi::findOrFail($id);
-        return view('transaksi.edit',);
+        return view('transaksi.edit', compact('transaksi'));
     }
 
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
         $request->validate([
             'bayar' => 'required|numeric'
         ]);
 
         $transaksi = Transaksi::findOrFail($id);
+        $total_harga = $transaksi->transaksidetail->sum('subtotal');
         $transaksi->bayar = $request->input('bayar');
-        $transaksi->kembalian =
+        $transaksi->kembalian = $transaksi->bayar - $total_harga;
+        $transaksi->save();
 
-        return redirect('/transaksi') -> with('pesan', 'Berhasil mengubah data');
+        return redirect()->route('transaksi.index')
+                         ->with('pesan', 'Berhasil mengubah data transaksi');
     }
 
-    public function destroy()
+    public function destroy($id)
     {
         $transaksi = Transaksi::findOrFail($id);
+        $transaksi->delete(); // Soft delete
 
-        return redirect('/transaksi');
+        return redirect()->route('transaksi.index')
+                         ->with('pesan', 'Berhasil menghapus transaksi');
     }
 }
