@@ -1,4 +1,5 @@
-
+@extends('layouts')
+@section('content')
     <h2>Data Detail Transaksi</h2>
     <div class="card">
         <div class="card-header bg-white">
@@ -17,18 +18,18 @@
                 </tr>
                 </thead>
                 <tbody>
-                @foreach ( as $index => $data)
+                @foreach ($transaksidetail as $index => $data)
                     <tr>
-                        <td>{{ $index+1 }}</td>
-                        <td>{{ \Carbon\Carbon::parse($data->transaksi->tanggal)->format('d/m/Y') }}</td>
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ \Carbon\Carbon::parse($data->transaksi->tanggal_pembelian)->format('d/m/Y') }}</td>
                         <td>{{ $data->nama_produk }}</td>
-                        <td class="text-end">{{ number_format($data->hargasatuan, 0, '.', '.') }}</td>
-                        <td class="text-end">{{ number_format($data->junlah, 0, '.', '.') }}</td>
-                        <td class="text-end">{{ number_format($data->subt0tal, 0, '.', '.') }}</td>
+                        <td class="text-end">{{ number_format($data->harga_satuan, 0, '.', '.') }}</td>
+                        <td class="text-end">{{ number_format($data->jumlah, 0, '.', '.') }}</td>
+                        <td class="text-end">{{ number_format($data->subtotal, 0, '.', '.') }}</td>
                     </tr>
                 @endforeach
                 </tbody>
             </table>
         </div>
     </div>
-
+@endsection
