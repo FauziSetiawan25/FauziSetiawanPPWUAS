@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TransaksiDetail extends Model
 {
-    use HasFactory, SoftDeletes; // Menambahkan SoftDeletes trait untuk mendukung soft delete
+    use HasFactory, SoftDeletes;  // Menambahkan SoftDeletes trait untuk mendukung soft delete
 
     // Tentukan nama tabel jika berbeda dari nama default (plural dari nama model)
     protected $table = 'transaksi_detail';
