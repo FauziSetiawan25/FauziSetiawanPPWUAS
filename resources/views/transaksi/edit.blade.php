@@ -1,4 +1,5 @@
-
+@extends('layouts')
+@section('content')
     <h2>Edit Transaksi</h2>
     <div class="card">
         <div class="card-header bg-white">
@@ -14,33 +15,34 @@
                     </ul>
                 </div>
             @endif
-            <form method="POST" action={{ route('transaksi.update', $transaksi->id) }}>
+            <form method="POST" action="{{ route('transaksi.update', $transaksi->id) }}">
                 @csrf
                 @method('PUT')
                 <div class="d-flex flex-column gap-4 mb-4">
                     <div class="form-group">
                         <label>Tanggal Pembelian</label>
-                        <input type="date" class="form-control" name="" value="{{ $transaksi-> }}" required>
+                        <input type="date" class="form-control" name="tanggal_pembelian" 
+                               value="{{ \Carbon\Carbon::parse($transaksi->tanggal_pembelian)->format('Y-m-d') }}" required>
                     </div>
                     <div class="form-group">
                         <label>Harga Total</label>
                         <div class="input-group mb-3">
                             <span class="input-group-text">Rp</span>
-                            <input type="number" class="form-control" name="" value="{{ $transaksi-> }}" disabled>
+                            <input type="number" class="form-control" name="total_harga" value="{{ $transaksi->total_harga }}" disabled>
                         </div>
                     </div>
                     <div class="form-group">
                         <label>Bayar</label>
                         <div class="input-group mb-3">
                             <span class="input-group-text">Rp</span>
-                            <input type="number" class="form-control" name="" value="{{ $transaksi-> }}" required>
+                            <input type="number" class="form-control" name="bayar" value="{{ $transaksi->bayar }}" required>
                         </div>
                     </div>
                     <div class="form-group">
                         <label>Kembalian</label>
                         <div class="input-group mb-3">
                             <span class="input-group-text">Rp</span>
-                            <input type="text" class="form-control" name="" value="{{ $transaksi-> }}" disabled>
+                            <input type="text" class="form-control" name="kembalian" value="{{ $transaksi->kembalian }}" disabled>
                         </div>
                     </div>
                 </div>
@@ -49,19 +51,23 @@
         </div>
     </div>
 
+    {{-- Custom JS --}}
+    <script>
+        $(document).ready(function() {
+            function calculateKembalian() {
+                const total_harga = parseInt($('input[name="total_harga"]').val()) || 0;
+                const bayar = parseInt($('input[name="bayar"]').val()) || 0;
+                const kembalian = bayar - total_harga;
+                $('input[name="kembalian"]').val(kembalian);
+            }
 
-{{--customjs--}}
-<script>
-    $(document).ready(function() {
-        function calculateKembalian() {
-            const total_harga = parseInt($('input[name="total_harga"]').val()) || 0;
-            const bayar = parseInt($('input[name="bayar"]').val()) || 0;
-            const kembalian = bayar - total_harga;
-            $('input[name="kembalian"]').val(kembalian);
-        }
+            // Trigger calculation when the "bayar" field changes
+            $('input[name="bayar"]').on('keyup change', function() {
+                calculateKembalian();
+            });
 
-        $('input[name="bayar"]').on('', function() {
+            // Initial calculation if values are pre-filled
             calculateKembalian();
         });
-    });
-</script>
+    </script>
+@endsection
