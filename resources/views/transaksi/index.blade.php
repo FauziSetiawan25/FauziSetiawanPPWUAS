@@ -1,4 +1,5 @@
 @extends('layouts')
+
 @section('content')
     <h2>Data Transaksi</h2>
     <div class="card">
@@ -11,6 +12,8 @@
                     {{ Session::get('pesan') }}
                 </div>
             @endif
+
+            {{-- Tabel Data Transaksi --}}
             <table class="table table-bordered datatable">
                 <thead>
                     <tr>
@@ -47,4 +50,7 @@
             </table>
         </div>
     </div>
+
+    {{-- Include Komponen DataTables --}}
+    @include('component.datatable')
 @endsection
