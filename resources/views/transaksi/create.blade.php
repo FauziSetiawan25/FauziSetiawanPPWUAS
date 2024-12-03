@@ -1,4 +1,5 @@
 @extends('layouts')
+
 @section('content')
     <h2>Tambah Transaksi</h2>
     <div class="card">
@@ -6,6 +7,7 @@
             <a href="{{ route('dashboard') }}" class="btn btn-outline-danger">Kembali</a>
         </div>
         <div class="card-body">
+            {{-- Tampilkan error validasi jika ada --}}
             @if ($errors->any())
                 <div class="alert alert-danger">
                     <ul class="m-0">
@@ -15,15 +17,18 @@
                     </ul>
                 </div>
             @endif
+
+            {{-- Form tambah transaksi --}}
             <form method="POST" action="{{ route('transaksi.store') }}">
                 @csrf
-                <div class="d-flex flex-column gap-4 mb-4">
+                <div class="mb-4">
                     <div class="form-group">
                         <label for="tanggal_pembelian">Tanggal Pembelian</label>
-                        <input type="date" class="form-control" name="tanggal_pembelian" value="{{ old('tanggal_pembelian') }}" required>
+                        <input type="date" id="tanggal_pembelian" name="tanggal_pembelian" class="form-control" value="{{ old('tanggal_pembelian') }}" required>
                     </div>
                 </div>
-                <h6>Produk yang dibeli</h6>
+
+                <h6>Produk yang Dibeli</h6>
                 <div class="accordion mb-4" id="accordionItem">
                     @for ($i = 1; $i <= 3; $i++)
                         <div class="accordion-item">
@@ -34,30 +39,26 @@
                             </h2>
                             <div id="item{{ $i }}" class="accordion-collapse collapse {{ $i === 1 ? 'show' : '' }}" data-bs-parent="#accordionItem">
                                 <div class="accordion-body">
-                                    <div class="d-flex flex-column gap-4 mb-4">
-                                        <div class="form-group">
-                                            <label for="nama_produk{{ $i }}">Nama Produk</label>
-                                            <input type="text" class="form-control" name="nama_produk{{ $i }}" value="{{ old('nama_produk'.$i) }}" required>
+                                    <div class="mb-3">
+                                        <label for="nama_produk{{ $i }}">Nama Produk</label>
+                                        <input type="text" id="nama_produk{{ $i }}" name="nama_produk{{ $i }}" class="form-control" value="{{ old('nama_produk' . $i) }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="harga_satuan{{ $i }}">Harga Satuan</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">Rp</span>
+                                            <input type="number" id="harga_satuan{{ $i }}" name="harga_satuan{{ $i }}" class="form-control" value="{{ old('harga_satuan' . $i) }}" required>
                                         </div>
-                                        <div class="form-group">
-                                            <label for="harga_satuan{{ $i }}">Harga Satuan</label>
-                                            <div class="input-group mb-3">
-                                                <span class="input-group-text">Rp</span>
-                                                <input type="number" class="form-control" name="harga_satuan{{ $i }}" value="{{ old('harga_satuan'.$i) }}" required>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="jumlah{{ $i }}">Jumlah</label>
-                                            <div class="input-group mb-3">
-                                                <input type="number" class="form-control" name="jumlah{{ $i }}" value="{{ old('jumlah'.$i) }}" required>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="subtotal{{ $i }}">Subtotal</label>
-                                            <div class="input-group mb-3">
-                                                <span class="input-group-text">Rp</span>
-                                                <input type="text" class="form-control" name="subtotal{{ $i }}" value="{{ old('subtotal'.$i) }}" readonly>
-                                            </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="jumlah{{ $i }}">Jumlah</label>
+                                        <input type="number" id="jumlah{{ $i }}" name="jumlah{{ $i }}" class="form-control" value="{{ old('jumlah' . $i) }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="subtotal{{ $i }}">Subtotal</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">Rp</span>
+                                            <input type="text" id="subtotal{{ $i }}" name="subtotal{{ $i }}" class="form-control" value="{{ old('subtotal' . $i) }}" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -65,27 +66,31 @@
                         </div>
                     @endfor
                 </div>
-                <div class="form-group">
+
+                <div class="mb-3">
                     <label for="total_harga">Harga Total</label>
-                    <div class="input-group mb-3">
+                    <div class="input-group">
                         <span class="input-group-text">Rp</span>
-                        <input type="number" class="form-control" name="total_harga" id="total_harga" value="{{ old('total_harga') }}" readonly>
+                        <input type="text" id="total_harga" name="total_harga" class="form-control" value="{{ old('total_harga') }}" readonly>
                     </div>
                 </div>
-                <div class="form-group">
+
+                <div class="mb-3">
                     <label for="bayar">Bayar</label>
-                    <div class="input-group mb-3">
+                    <div class="input-group">
                         <span class="input-group-text">Rp</span>
-                        <input type="number" class="form-control" name="bayar" id="bayar" value="{{ old('bayar') }}" required>
+                        <input type="number" id="bayar" name="bayar" class="form-control" value="{{ old('bayar') }}" required>
                     </div>
                 </div>
-                <div class="form-group">
+
+                <div class="mb-3">
                     <label for="kembalian">Kembalian</label>
-                    <div class="input-group mb-3">
+                    <div class="input-group">
                         <span class="input-group-text">Rp</span>
-                        <input type="text" class="form-control" name="kembalian" id="kembalian" value="{{ old('kembalian') }}" readonly>
+                        <input type="text" id="kembalian" name="kembalian" class="form-control" value="{{ old('kembalian') }}" readonly>
                     </div>
                 </div>
+
                 <button type="submit" class="btn btn-primary">Simpan</button>
             </form>
         </div>
@@ -93,37 +98,37 @@
 
     {{-- Custom JS --}}
     <script>
-        $(document).ready(function() {
-            let subtotals = {
-                subtotal1: 0,
-                subtotal2: 0,
-                subtotal3: 0
+        document.addEventListener("DOMContentLoaded", () => {
+            const calculateSubtotal = (index) => {
+                const hargaSatuan = parseInt(document.getElementById(`harga_satuan${index}`).value || 0);
+                const jumlah = parseInt(document.getElementById(`jumlah${index}`).value || 0);
+                const subtotal = hargaSatuan * jumlah;
+
+                document.getElementById(`subtotal${index}`).value = subtotal;
+                calculateTotal();
             };
 
-            function calculateSubtotal(item) {
-                const hargaSatuan = parseInt($('input[name="harga_satuan'+item+'"]').val()) || 0;
-                const jumlah = parseInt($('input[name="jumlah'+item+'"]').val()) || 0;
-                subtotals['subtotal'+item] = hargaSatuan * jumlah;
-                $('input[name="subtotal'+item+'"]').val(subtotals['subtotal'+item]);
-                $('input[name="total_harga"]').val(Object.values(subtotals).reduce((acc, curr) => acc + curr, 0));
+            const calculateTotal = () => {
+                let total = 0;
+                for (let i = 1; i <= 3; i++) {
+                    total += parseInt(document.getElementById(`subtotal${i}`).value || 0);
+                }
+                document.getElementById("total_harga").value = total;
+                calculateKembalian();
+            };
+
+            const calculateKembalian = () => {
+                const totalHarga = parseInt(document.getElementById("total_harga").value || 0);
+                const bayar = parseInt(document.getElementById("bayar").value || 0);
+                document.getElementById("kembalian").value = bayar - totalHarga;
+            };
+
+            for (let i = 1; i <= 3; i++) {
+                document.getElementById(`harga_satuan${i}`).addEventListener("input", () => calculateSubtotal(i));
+                document.getElementById(`jumlah${i}`).addEventListener("input", () => calculateSubtotal(i));
             }
 
-            $('input[name="harga_satuan1"], input[name="jumlah1"]').on('keyup change', function() {
-                calculateSubtotal(1);
-            });
-            $('input[name="harga_satuan2"], input[name="jumlah2"]').on('keyup change', function() {
-                calculateSubtotal(2);
-            });
-            $('input[name="harga_satuan3"], input[name="jumlah3"]').on('keyup change', function() {
-                calculateSubtotal(3);
-            });
-
-            $('input[name="bayar"]').on('keyup change', function() {
-                const total_harga = parseInt($('input[name="total_harga"]').val()) || 0;
-                const bayar = parseInt($('input[name="bayar"]').val()) || 0;
-                const kembalian = bayar - total_harga;
-                $('input[name="kembalian"]').val(kembalian);
-            });
+            document.getElementById("bayar").addEventListener("input", calculateKembalian);
         });
     </script>
 @endsection
