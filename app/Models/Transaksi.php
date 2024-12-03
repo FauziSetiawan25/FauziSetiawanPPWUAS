@@ -15,7 +15,6 @@ class Transaksi extends Model
         'tanggal_pembelian',
         'total_harga',
         'bayar',
-        'kembalian',
     ];
 
     
